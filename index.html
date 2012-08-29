@@ -72,7 +72,14 @@
 
 <p>References can't be used, since a reference is already being used internally. </p>
 
-<p>This macro is much more powerful than the simple <code>RETURNS</code> macro. A multi-statement function can be written:</p>
+<p>This macro is much more powerful than using the simple <code>RETURNS</code> macro: </p>
+
+<div class="highlight"><pre><span class="cp">#define RETURNS(...) -&gt; decltype(__VA_ARGS__) { return (__VA_ARGS__); }</span>
+<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="p">,</span> <span class="k">class</span> <span class="nc">U</span><span class="o">&gt;</span>
+<span class="k">auto</span> <span class="n">min</span><span class="p">(</span><span class="n">T</span> <span class="n">x</span><span class="p">,</span> <span class="n">U</span> <span class="n">y</span><span class="p">)</span> <span class="n">RETURNS</span><span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">y</span> <span class="o">?</span> <span class="n">x</span> <span class="o">:</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+
+<p>A multi-statement function can be written:</p>
 
 <div class="highlight"><pre><span class="n">PYTHY</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
 <span class="p">(</span>
@@ -88,6 +95,8 @@
     <span class="k">return</span> <span class="p">[</span><span class="o">=</span><span class="p">](</span><span class="n">decltype</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="n">y</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">x</span> <span class="o">==</span> <span class="n">y</span><span class="p">;</span> <span class="p">}</span>
 <span class="p">)</span>
 </pre></div>
+
+<p>Which can not be done using the <code>RETURNS</code> macro.</p>
 
 <h2>Implementation</h2>
 
@@ -120,7 +129,7 @@
 <span class="k">auto</span> <span class="n">min</span><span class="p">(</span><span class="n">T0</span> <span class="n">x</span><span class="p">,</span> <span class="n">T1</span> <span class="n">x</span><span class="p">)</span> <span class="n">RETURNS</span><span class="p">((</span><span class="o">*</span><span class="n">min_t</span><span class="o">&lt;</span><span class="n">T0</span><span class="p">,</span> <span class="n">T1</span><span class="o">&gt;::</span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)))</span>
 </pre></div>
 
-<p>It appears that we are derefencing a null pointer. Remember in C++ when dereferencing a null pointer, undefined behavior occurs when there is an rvalue-to-lvalue conversion. However, since a non-capturing lambda closure is almost always implemented as an object with no members, undefined behavior never occurs, since it won't access any of its members. Its highly unlikely that a non-capturing lambda closure could be implemented another way since it must be convertible to a function pointer.</p>
+<p>It appears that we are derefencing a null pointer. Remember in C++ when dereferencing a null pointer, undefined behavior occurs when there is an rvalue-to-lvalue conversion. However, since a non-capturing lambda closure is almost always implemented as an object with no members, undefined behavior never occurs, since it won't access any of its members. Its highly unlikely that a non-capturing lambda closure could be implemented another way since it must be convertible to a function pointer. But perhaps not? </p>
 
 <h2>Requirements</h2>
 
