@@ -30,13 +30,13 @@ PYTHY(add, mutable x, y)
 ```
 References can't be used, since a reference is already being used internally. 
 
-This macro is much more powerful than using the simple `RETURNS` macro: 
+This macro is much more powerful than using the simple `RETURNS` macro, like below: 
 ```c++
 #define RETURNS(...) -> decltype(__VA_ARGS__) { return (__VA_ARGS__); }
 template<class T, class U>
 auto min(T x, U y) RETURNS(x < y ? x : y)
 ```
-A multi-statement function can be written:
+For example, a multi-statement function can be written:
 ```c++
 PYTHY(first, r)
 (
@@ -80,7 +80,7 @@ struct min_t
 Then when we want to call our function, we can do this:
 ```c++
 template<class T0, class T1>
-auto min(T0 x, T1 x) RETURNS((*min_t<T0, T1>::f(x, y)))
+auto min(T0 x, T1 x) RETURNS((*min_t<T0, T1>::f)(x, y))
 ```
 It appears that we are derefencing a null pointer. Remember in C++ when dereferencing a null pointer, undefined behavior occurs when there is an rvalue-to-lvalue conversion. However, since a non-capturing lambda closure is almost always implemented as an object with no members, undefined behavior never occurs, since it won't access any of its members. Its highly unlikely that a non-capturing lambda closure could be implemented another way since it must be convertible to a function pointer. But perhaps not? 
 
