@@ -1,0 +1,134 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Pythy by pfultz2</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/pfultz2/Pythy">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/pfultz2/Pythy/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/pfultz2/Pythy/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Pythy</h1>
+          <p>Having it all now: Pythy syntax for C++11</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/pfultz2">pfultz2</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>Pythy</h1>
+
+<p>Having it all now: Pythy syntax for C++11. </p>
+
+<h2>Overview</h2>
+
+<p>In a <a href="http://cpp-next.com/archive/2011/11/having-it-all-pythy-syntax/">blog post</a>, David Abrahams discussed an improved function syntax based around polymorphic lambdas:</p>
+
+<div class="highlight"><pre><span class="p">[]</span><span class="n">min</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="p">{</span> <span class="k">return</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">y</span> <span class="o">?</span> <span class="n">x</span> <span class="o">:</span> <span class="n">y</span><span class="p">;</span> <span class="p">}</span>
+</pre></div>
+
+<p>The pythy library implements this in C++11 using a macro like this:</p>
+
+<div class="highlight"><pre><span class="n">PYTHY</span><span class="p">(</span><span class="n">min</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="p">(</span> <span class="k">return</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">y</span> <span class="o">?</span> <span class="n">x</span> <span class="o">:</span> <span class="n">y</span><span class="p">;</span> <span class="p">)</span>
+</pre></div>
+
+<p>Internally, it uses references for each of the parameters. To make each parameter const, the const keyword can be written:</p>
+
+<div class="highlight"><pre><span class="n">PYTHY</span><span class="p">(</span><span class="n">min</span><span class="p">,</span> <span class="k">const</span> <span class="n">x</span><span class="p">,</span> <span class="k">const</span> <span class="n">y</span><span class="p">)</span>
+<span class="p">(</span> <span class="k">return</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">y</span> <span class="o">?</span> <span class="n">x</span> <span class="o">:</span> <span class="n">y</span><span class="p">;</span> <span class="p">)</span>
+</pre></div>
+
+<p>If mutablility needs to be forced, the <code>mutable</code> keyword can be used:</p>
+
+<div class="highlight"><pre><span class="n">PYTHY</span><span class="p">(</span><span class="n">add</span><span class="p">,</span> <span class="k">mutable</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="p">(</span>
+    <span class="n">x</span> <span class="o">+=</span> <span class="n">y</span><span class="p">;</span>
+<span class="p">)</span>
+</pre></div>
+
+<p>References can't be used, since a reference is already being used internally. </p>
+
+<p>This macro is much more powerful than the simple <code>RETURNS</code> macro. A multi-statement function can be written:</p>
+
+<div class="highlight"><pre><span class="n">PYTHY</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+<span class="p">(</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span> <span class="k">throw</span> <span class="s">"The range is empty"</span><span class="p">;</span>
+    <span class="k">return</span> <span class="o">*</span><span class="p">(</span><span class="n">begin</span><span class="p">(</span><span class="n">r</span><span class="p">));</span>
+<span class="p">)</span>
+</pre></div>
+
+<p>Or a function that returns lambda can be written:</p>
+
+<div class="highlight"><pre><span class="n">PYTHY</span><span class="p">(</span><span class="n">equal_to</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+<span class="p">(</span>
+    <span class="k">return</span> <span class="p">[</span><span class="o">=</span><span class="p">](</span><span class="n">decltype</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="n">y</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">x</span> <span class="o">==</span> <span class="n">y</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+
+<h2>Implementation</h2>
+
+<p>This is implemented using a templated lambda. Lambdas can't be templated locally(and neither can classes), but we can make a lambda depend on a template parameter. So, if we define a lambda inside a templated class, like this:</p>
+
+<div class="highlight"><pre><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T0</span><span class="p">,</span> <span class="k">class</span> <span class="nc">T1</span><span class="o">&gt;</span>
+<span class="k">struct</span> <span class="n">min_t</span>
+<span class="p">{</span>
+    <span class="n">constexpr</span> <span class="k">static</span> <span class="k">auto</span> <span class="n">f</span> <span class="o">=</span> <span class="p">[](</span><span class="n">T0</span> <span class="n">x</span><span class="p">,</span> <span class="n">T1</span> <span class="n">y</span><span class="p">){</span> <span class="k">return</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">y</span> <span class="o">?</span> <span class="n">x</span> <span class="o">:</span> <span class="n">y</span><span class="p">;</span> <span class="p">};</span> 
+<span class="p">};</span>
+</pre></div>
+
+<p>This won't work, because a lambda closure(even if its non-capturing) is not a constexpr. However, using a trick(as suggested by Richard Smith from clang) we can initialize it as a null pointer:</p>
+
+<div class="highlight"><pre><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span> 
+<span class="k">typename</span> <span class="n">std</span><span class="o">::</span><span class="n">remove_reference</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">type</span> <span class="o">*</span><span class="n">addr</span><span class="p">(</span><span class="n">T</span> <span class="o">&amp;&amp;</span><span class="n">t</span><span class="p">)</span> 
+<span class="p">{</span> 
+    <span class="k">return</span> <span class="o">&amp;</span><span class="n">t</span><span class="p">;</span> 
+<span class="p">}</span>
+<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T0</span><span class="p">,</span> <span class="k">class</span> <span class="nc">T1</span><span class="o">&gt;</span>
+<span class="k">struct</span> <span class="n">min_t</span>
+<span class="p">{</span>
+    <span class="n">constexpr</span> <span class="k">static</span> <span class="k">auto</span> <span class="o">*</span><span class="n">f</span> <span class="o">=</span> <span class="kc">false</span> <span class="o">?</span> <span class="n">addr</span><span class="p">([](</span><span class="n">T0</span> <span class="n">x</span><span class="p">,</span> <span class="n">T1</span> <span class="n">y</span><span class="p">){</span> <span class="k">return</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">y</span> <span class="o">?</span> <span class="n">x</span> <span class="o">:</span> <span class="n">y</span><span class="p">;</span> <span class="p">})</span> <span class="o">:</span> <span class="n">nullptr</span><span class="p">;</span> 
+<span class="p">};</span>
+</pre></div>
+
+<p>Then when we want to call our function, we can do this:</p>
+
+<div class="highlight"><pre><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T0</span><span class="p">,</span> <span class="k">class</span> <span class="nc">T1</span><span class="o">&gt;</span>
+<span class="k">auto</span> <span class="n">min</span><span class="p">(</span><span class="n">T0</span> <span class="n">x</span><span class="p">,</span> <span class="n">T1</span> <span class="n">x</span><span class="p">)</span> <span class="n">RETURNS</span><span class="p">((</span><span class="o">*</span><span class="n">min_t</span><span class="o">&lt;</span><span class="n">T0</span><span class="p">,</span> <span class="n">T1</span><span class="o">&gt;::</span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)))</span>
+</pre></div>
+
+<p>It appears that we are derefencing a null pointer. Remember in C++ when dereferencing a null pointer, undefined behavior occurs when there is an rvalue-to-lvalue conversion. However, since a non-capturing lambda closure is almost always implemented as an object with no members, undefined behavior never occurs, since it won't access any of its members. Its highly unlikely that a non-capturing lambda closure could be implemented another way since it must be convertible to a function pointer.</p>
+
+<h2>Requirements</h2>
+
+<p>This requires a compiler that supports <code>auto</code>, <code>constexpr</code> and lambdas. It also relies on boost. For some compilers the <code>-DBOOST_PP_VARIADICS=1</code> must be passed into the compiler.</p>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
