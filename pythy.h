@@ -26,7 +26,7 @@ namespace pythy
     };
 }
 
-#define PYTHY_RETURNS(...) -> decltype(__VA_ARGS__) { return (__VA_ARGS__); }
+#define PYTHY_RETURNS(...) noexcept(noexcept(decltype(__VA_ARGS__)(std::move(__VA_ARGS__)))) -> decltype(__VA_ARGS__)  { return (__VA_ARGS__); }
 
 //
 // PYTHY_IS_PAREN is used to detect if the first token is a parenthesis.
