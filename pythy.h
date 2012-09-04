@@ -135,7 +135,10 @@ struct PYTHY_CLASS_NAME(name) \
 //
 // PYTHY_BODY
 //
-#define PYTHY_BODY(...) { __VA_ARGS__ } : nullptr; };
+#define PYTHY_BODY(...) \
+{ __VA_ARGS__ } : nullptr; \
+static_assert(std::is_empty<typename std::decay<decltype(*p)>::type>::value, "Pythy can't be used on this compiler: Non-capturing lambda must be empty."); \
+};
 
 //
 // PYTHY
