@@ -149,7 +149,7 @@ static_assert(std::is_empty<typename std::decay<decltype(*p)>::type>::value, "Py
     PYTHY_BODY
 
 #ifndef BOOST_PP_VARIADIC_TO_SEQ
-#error no vardiacs
+#error no variadics
 #endif
     
 #endif
