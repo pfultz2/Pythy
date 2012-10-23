@@ -25,6 +25,45 @@ namespace pythy
             return &t; 
         }
     };
+
+    template<class T>
+    struct ref_holder
+    {
+        T x;
+
+        template<class X>
+        ref_holder(X&& x) : x(std::forward<X>(x))
+        {}
+
+        operator T&&() const
+        {
+            return std::forward<T>(x);
+        }
+    };
+
+    template<class T>
+    ref_holder<T> ref(T&& x)
+    {
+        return ref_holder<T>(std::forward<T>(x));
+    }
+
+    template<class T>
+    struct unwrap_type
+    {
+        typedef T type;
+    };
+
+    template<class T>
+    struct unwrap_type<ref_holder<T> >
+    {
+        typedef T type;
+    };
+
+    template<class T>
+    typename unwrap_type<T>::type unwrap(T x)
+    {
+        return x;
+    }
 }
 
 #define PYTHY_RETURNS(...) noexcept(noexcept(decltype(__VA_ARGS__)(std::move(__VA_ARGS__)))) -> decltype(__VA_ARGS__)  { return (__VA_ARGS__); }
@@ -116,8 +155,8 @@ template<BOOST_PP_ENUM_PARAMS(n, class T)> \
 auto name(BOOST_PP_ENUM_BINARY_PARAMS(n, T, && x)) \
 PYTHY_RETURNS \
 ( \
-(*PYTHY_CLASS_NAME(name)<BOOST_PP_ENUM_PARAMS(n, T)>::p) \
-(BOOST_PP_ENUM(n, PYTHY_FORWARD_ENUM, ~)) \
+pythy::unwrap((*PYTHY_CLASS_NAME(name)<BOOST_PP_ENUM_PARAMS(n, T)>::p) \
+(BOOST_PP_ENUM(n, PYTHY_FORWARD_ENUM, ~))) \
 )
 
 //
