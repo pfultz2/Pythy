@@ -8,6 +8,7 @@
 
 #include <boost/preprocessor.hpp>
 #include <boost/preprocessor/facilities/is_empty.hpp>
+#include <utility>
 #include <type_traits>
 
 
@@ -147,5 +148,8 @@ static_assert(std::is_empty<typename std::decay<decltype(*p)>::type>::value, "Py
     PYTHY_HEADER(name, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__)) \
     PYTHY_BODY
 
-
+#ifndef BOOST_PP_VARIADIC_TO_SEQ
+#error no vardiacs
+#endif
+    
 #endif
