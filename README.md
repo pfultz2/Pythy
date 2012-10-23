@@ -30,6 +30,14 @@ PYTHY(add, mutable x, y)
 ```
 References can't be used, since a reference is already being used internally. 
 
+By default, pythy functions decay their return value, just like lambdas; so they always return by value, However, the `pythy::ref` function can be used to return a reference:
+```c++
+PYTHY(first, r)
+(
+    return pythy::ref(*(begin(r)));
+)
+```
+
 This macro is much more powerful than using the simple `RETURNS` macro, like below: 
 ```c++
 #define RETURNS(...) -> decltype(__VA_ARGS__) { return (__VA_ARGS__); }
@@ -41,7 +49,7 @@ For example, a multi-statement function can be written:
 PYTHY(first, r)
 (
     if (r.empty()) throw "The range is empty";
-    return *(begin(r));
+    return pythy::ref(*(begin(r)));
 )
 ```
 Or a function that returns lambda can be written:
@@ -82,9 +90,9 @@ Then when we want to call our function, we can do this:
 template<class T0, class T1>
 auto min(T0 x, T1 x) RETURNS((*min_t<T0, T1>::f)(x, y))
 ```
-It appears that we are derefencing a null pointer. Remember in C++ when dereferencing a null pointer, undefined behavior occurs when there is an rvalue-to-lvalue conversion. However, since a non-capturing lambda closure is almost always implemented as an object with no members, undefined behavior never occurs, since it won't access any of its members. Its highly unlikely that a non-capturing lambda closure could be implemented another way since it must be convertible to a function pointer. But perhaps not? 
+It appears that we are derefencing a null pointer. Remember in C++ when dereferencing a null pointer, undefined behavior occurs when there is an lvalue-to-rvalue conversion. However, since a non-capturing lambda closure is almost always implemented as an object with no members, undefined behavior never occurs, since it won't access any of its members. Its highly unlikely that a non-capturing lambda closure could be implemented another way since it must be convertible to a function pointer. But the library does statically assert that the closure object is empty to avoid any possible undefined behavior.
 
 Requirements
 ------------
 
-This requires a compiler that supports `auto`, `constexpr` and lambdas. It also relies on boost. For some compilers the `-DBOOST_PP_VARIADICS=1` must be passed into the compiler.
+This requires a compiler that supports `auto`, `constexpr` and lambdas. It also relies on boost. For some compilers the `-DBOOST_PP_VARIADICS=1` must be passed into the compiler. 
