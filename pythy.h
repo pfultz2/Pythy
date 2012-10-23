@@ -26,6 +26,12 @@ namespace pythy
         }
     };
 
+    struct void_ {};
+    template<class T> T&& operator,(T&&x, void_)
+    {
+        return std::forward<T>(x);
+    }
+
     template<class T>
     struct ref_holder
     {
@@ -64,11 +70,21 @@ namespace pythy
     {
         return x;
     }
+
+    void unwrap(void_)
+    {}
+    
+    template<typename T>
+    typename std::remove_reference<T>::type&&
+    move(T&& x) noexcept;
+    void move(void_);
 }
 
-#define PYTHY_FORWARD(...) ref_holder<decltype(__VA_ARGS__)>(std::forward<decltype(__VA_ARGS__)>(__VA_ARGS__))
 
-#define PYTHY_RETURNS(...) noexcept(noexcept(decltype(__VA_ARGS__)(std::move(__VA_ARGS__)))) -> decltype(__VA_ARGS__)  { return (__VA_ARGS__); }
+#define PYTHY_AVOID(...) ((__VA_ARGS__), pythy::void_())
+#define PYTHY_RETURNS(...) noexcept(noexcept(decltype(__VA_ARGS__)(pythy::move(PYTHY_AVOID(__VA_ARGS__))))) -> decltype(__VA_ARGS__)  { return (__VA_ARGS__); }
+
+#define PYTHY_FORWARD(...) ref_holder<decltype(__VA_ARGS__)>(std::forward<decltype(__VA_ARGS__)>(__VA_ARGS__))
 
 //
 // PYTHY_IS_PAREN is used to detect if the first token is a parenthesis.
@@ -157,8 +173,8 @@ template<BOOST_PP_ENUM_PARAMS(n, class T)> \
 auto name(BOOST_PP_ENUM_BINARY_PARAMS(n, T, && x)) \
 PYTHY_RETURNS \
 ( \
-pythy::unwrap((*PYTHY_CLASS_NAME(name)<BOOST_PP_ENUM_PARAMS(n, T)>::p) \
-(BOOST_PP_ENUM(n, PYTHY_FORWARD_FUNCTION_ENUM, ~))) \
+pythy::unwrap(PYTHY_AVOID((*PYTHY_CLASS_NAME(name)<BOOST_PP_ENUM_PARAMS(n, T)>::p) \
+(BOOST_PP_ENUM(n, PYTHY_FORWARD_FUNCTION_ENUM, ~)))) \
 )
 
 //
