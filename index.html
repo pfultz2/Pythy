@@ -72,6 +72,14 @@
 
 <p>References can't be used, since a reference is already being used internally. </p>
 
+<p>By default, pythy functions decay their return value, just like lambdas; so they always return by value, However, the <code>pythy::ref</code> function can be used to return a reference:</p>
+
+<div class="highlight"><pre><span class="n">PYTHY</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+<span class="p">(</span>
+    <span class="k">return</span> <span class="n">pythy</span><span class="o">::</span><span class="n">ref</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">begin</span><span class="p">(</span><span class="n">r</span><span class="p">)));</span>
+<span class="p">)</span>
+</pre></div>
+
 <p>This macro is much more powerful than using the simple <code>RETURNS</code> macro, like below: </p>
 
 <div class="highlight"><pre><span class="cp">#define RETURNS(...) -&gt; decltype(__VA_ARGS__) { return (__VA_ARGS__); }</span>
@@ -84,7 +92,7 @@
 <div class="highlight"><pre><span class="n">PYTHY</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
 <span class="p">(</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span> <span class="k">throw</span> <span class="s">"The range is empty"</span><span class="p">;</span>
-    <span class="k">return</span> <span class="o">*</span><span class="p">(</span><span class="n">begin</span><span class="p">(</span><span class="n">r</span><span class="p">));</span>
+    <span class="k">return</span> <span class="n">pythy</span><span class="o">::</span><span class="n">ref</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">begin</span><span class="p">(</span><span class="n">r</span><span class="p">)));</span>
 <span class="p">)</span>
 </pre></div>
 
@@ -129,11 +137,11 @@
 <span class="k">auto</span> <span class="n">min</span><span class="p">(</span><span class="n">T0</span> <span class="n">x</span><span class="p">,</span> <span class="n">T1</span> <span class="n">x</span><span class="p">)</span> <span class="n">RETURNS</span><span class="p">((</span><span class="o">*</span><span class="n">min_t</span><span class="o">&lt;</span><span class="n">T0</span><span class="p">,</span> <span class="n">T1</span><span class="o">&gt;::</span><span class="n">f</span><span class="p">)(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
 </pre></div>
 
-<p>It appears that we are derefencing a null pointer. Remember in C++ when dereferencing a null pointer, undefined behavior occurs when there is an rvalue-to-lvalue conversion. However, since a non-capturing lambda closure is almost always implemented as an object with no members, undefined behavior never occurs, since it won't access any of its members. Its highly unlikely that a non-capturing lambda closure could be implemented another way since it must be convertible to a function pointer. But perhaps not? </p>
+<p>It appears that we are derefencing a null pointer. Remember in C++ when dereferencing a null pointer, undefined behavior occurs when there is an lvalue-to-rvalue conversion. However, since a non-capturing lambda closure is almost always implemented as an object with no members, undefined behavior never occurs, since it won't access any of its members. Its highly unlikely that a non-capturing lambda closure could be implemented another way since it must be convertible to a function pointer. But the library does statically assert that the closure object is empty to avoid any possible undefined behavior.</p>
 
 <h2>Requirements</h2>
 
-<p>This requires a compiler that supports <code>auto</code>, <code>constexpr</code> and lambdas. It also relies on boost. For some compilers the <code>-DBOOST_PP_VARIADICS=1</code> must be passed into the compiler.</p>
+<p>This requires a compiler that supports <code>auto</code>, <code>constexpr</code> and lambdas. It also relies on boost. For some compilers the <code>-DBOOST_PP_VARIADICS=1</code> must be passed into the compiler. </p>
       </section>
 
     </div>
