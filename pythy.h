@@ -66,6 +66,8 @@ namespace pythy
     }
 }
 
+#define PYTHY_FORWARD(...) ref_holder<decltype(__VA_ARGS__)>(std::forward<decltype(__VA_ARGS__)>(__VA_ARGS__))
+
 #define PYTHY_RETURNS(...) noexcept(noexcept(decltype(__VA_ARGS__)(std::move(__VA_ARGS__)))) -> decltype(__VA_ARGS__)  { return (__VA_ARGS__); }
 
 //
@@ -147,16 +149,16 @@ BOOST_PP_SEQ_ENUM(BOOST_PP_SEQ_TRANSFORM(PYTHY_TEMPLATE_ARGS_OP, ~, BOOST_PP_SEQ
 
 
 //
-// PYTHY_FORWARD creates the forwarding function
+// PYTHY_FORWARD_FUNCTION creates the forwarding function
 //
-#define PYTHY_FORWARD_ENUM(z, n, data) std::forward<T ## n>(x ## n)
-#define PYTHY_FORWARD(name, n) \
+#define PYTHY_FORWARD_FUNCTION_ENUM(z, n, data) std::forward<T ## n>(x ## n)
+#define PYTHY_FORWARD_FUNCTION(name, n) \
 template<BOOST_PP_ENUM_PARAMS(n, class T)> \
 auto name(BOOST_PP_ENUM_BINARY_PARAMS(n, T, && x)) \
 PYTHY_RETURNS \
 ( \
 pythy::unwrap((*PYTHY_CLASS_NAME(name)<BOOST_PP_ENUM_PARAMS(n, T)>::p) \
-(BOOST_PP_ENUM(n, PYTHY_FORWARD_ENUM, ~))) \
+(BOOST_PP_ENUM(n, PYTHY_FORWARD_FUNCTION_ENUM, ~))) \
 )
 
 //
@@ -165,7 +167,7 @@ pythy::unwrap((*PYTHY_CLASS_NAME(name)<BOOST_PP_ENUM_PARAMS(n, T)>::p) \
 #define PYTHY_HEADER(name, args) \
 template<PYTHY_TEMPLATE_ARGS(args)> \
 struct PYTHY_CLASS_NAME(name); \
-PYTHY_FORWARD(name, BOOST_PP_SEQ_SIZE(args)) \
+PYTHY_FORWARD_FUNCTION(name, BOOST_PP_SEQ_SIZE(args)) \
 \
 template<PYTHY_TEMPLATE_ARGS(args)> \
 struct PYTHY_CLASS_NAME(name) \
